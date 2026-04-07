@@ -180,15 +180,94 @@ dt_importance = pd.DataFrame({
 print("\nDecision Tree Feature Importance:")
 print(dt_importance)
 
+# ----------------------
+# 7b. RIDGE REGRESSION
+# ----------------------
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
+
+ridge_model = Ridge(alpha=1.0)
+ridge_model.fit(X_train, y_train)
+
+ridge_pred = ridge_model.predict(X_test)
+
+ridge_r2 = r2_score(y_test, ridge_pred)
+ridge_mae = mean_absolute_error(y_test, ridge_pred)
+ridge_mse = mean_squared_error(y_test, ridge_pred)
+
+print("\n==============================")
+print("Ridge Regression Results")
+print("==============================")
+print("R^2 :", ridge_r2)
+print("MAE :", ridge_mae)
+print("MSE :", ridge_mse)
+
+
+# ----------------------
+# 7c. RANDOM FOREST
+# ----------------------
+rf_model = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=5,
+    random_state=42
+)
+rf_model.fit(X_train, y_train)
+
+rf_pred = rf_model.predict(X_test)
+
+rf_r2 = r2_score(y_test, rf_pred)
+rf_mae = mean_absolute_error(y_test, rf_pred)
+rf_mse = mean_squared_error(y_test, rf_pred)
+
+print("\n==============================")
+print("Random Forest Results")
+print("==============================")
+print("R^2 :", rf_r2)
+print("MAE :", rf_mae)
+print("MSE :", rf_mse)
+
+rf_importance = pd.DataFrame({
+    "Feature": features,
+    "Importance": rf_model.feature_importances_
+}).sort_values(by="Importance", ascending=False)
+
+print("\nRandom Forest Feature Importance:")
+print(rf_importance)
+
+# -------------------
+# 8. MODEL COMPARISON
+# -------------------
+#results = pd.DataFrame({
+#    "Model": ["Linear Regression", "Decision Tree Regression"],
+#   "R^2": [lr_r2, dt_r2],
+#    "MAE": [lr_mae, dt_mae],
+#    "MSE": [lr_mse, dt_mse]
+#})
+
 # -------------------
 # 8. MODEL COMPARISON
 # -------------------
 results = pd.DataFrame({
-    "Model": ["Linear Regression", "Decision Tree Regression"],
-    "R^2": [lr_r2, dt_r2],
-    "MAE": [lr_mae, dt_mae],
-    "MSE": [lr_mse, dt_mse]
+    "Model": ["Linear Regression", "Ridge Regression", "Decision Tree Regression", "Random Forest"],
+    "R^2": [lr_r2, ridge_r2, dt_r2, rf_r2],
+    "MAE": [lr_mae, ridge_mae, dt_mae, rf_mae],
+    "MSE": [lr_mse, ridge_mse, dt_mse, rf_mse]
 })
+
+print("\n==============================")
+print("Model Comparison")
+print("==============================")
+print(results)
+
+
+# Plot R^2 comparison
+plt.figure(figsize=(8, 4))
+plt.bar(results["Model"], results["R^2"], color=["skyblue", "steelblue", "lightgreen", "seagreen"])
+plt.title("Model Comparison: R^2")
+plt.ylabel("R^2")
+plt.xticks(rotation=45, ha='right')
+plt.tight_layout()
+plt.show()
 
 print("\n==============================")
 print("Model Comparison")
