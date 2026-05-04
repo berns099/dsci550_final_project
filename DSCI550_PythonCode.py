@@ -130,7 +130,7 @@ print("\nTraining set shape:", X_train.shape)
 print("Test set shape:", X_test.shape)
 
 # --------------------
-# 6. LINEAR REGRESSION
+# 6-a. LINEAR REGRESSION
 # --------------------
 lr_model = LinearRegression()
 lr_model.fit(X_train, y_train)
@@ -148,9 +148,30 @@ print("R^2 :", lr_r2)
 print("MAE :", lr_mae)
 print("MSE :", lr_mse)
 
+# ----------------------
+# 6-b. RIDGE REGRESSION
+# ----------------------
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
+
+ridge_model = Ridge(alpha=1.0)
+ridge_model.fit(X_train, y_train)
+
+ridge_pred = ridge_model.predict(X_test)
+
+ridge_r2 = r2_score(y_test, ridge_pred)
+ridge_mae = mean_absolute_error(y_test, ridge_pred)
+ridge_mse = mean_squared_error(y_test, ridge_pred)
+
+print("\n==============================")
+print("Ridge Regression Results")
+print("==============================")
+print("R^2 :", ridge_r2)
+print("MAE :", ridge_mae)
+print("MSE :", ridge_mse)
 
 # ---------------------------
-# 7. DECISION TREE REGRESSION
+# 6-c. DECISION TREE REGRESSION
 # ---------------------------
 dt_model = DecisionTreeRegressor(
     max_depth=5,
@@ -181,30 +202,7 @@ print("\nDecision Tree Feature Importance:")
 print(dt_importance)
 
 # ----------------------
-# 7b. RIDGE REGRESSION
-# ----------------------
-from sklearn.linear_model import Ridge
-from sklearn.ensemble import RandomForestRegressor
-
-ridge_model = Ridge(alpha=1.0)
-ridge_model.fit(X_train, y_train)
-
-ridge_pred = ridge_model.predict(X_test)
-
-ridge_r2 = r2_score(y_test, ridge_pred)
-ridge_mae = mean_absolute_error(y_test, ridge_pred)
-ridge_mse = mean_squared_error(y_test, ridge_pred)
-
-print("\n==============================")
-print("Ridge Regression Results")
-print("==============================")
-print("R^2 :", ridge_r2)
-print("MAE :", ridge_mae)
-print("MSE :", ridge_mse)
-
-
-# ----------------------
-# 7c. RANDOM FOREST
+# 6-d. RANDOM FOREST
 # ----------------------
 rf_model = RandomForestRegressor(
     n_estimators=100,
@@ -234,18 +232,9 @@ rf_importance = pd.DataFrame({
 print("\nRandom Forest Feature Importance:")
 print(rf_importance)
 
-# -------------------
-# 8. MODEL COMPARISON
-# -------------------
-#results = pd.DataFrame({
-#    "Model": ["Linear Regression", "Decision Tree Regression"],
-#   "R^2": [lr_r2, dt_r2],
-#    "MAE": [lr_mae, dt_mae],
-#    "MSE": [lr_mse, dt_mse]
-#})
 
 # -------------------
-# 8. MODEL COMPARISON
+# 7. MODEL COMPARISON
 # -------------------
 results = pd.DataFrame({
     "Model": ["Linear Regression", "Ridge Regression", "Decision Tree Regression", "Random Forest"],
@@ -283,12 +272,20 @@ plt.tight_layout()
 plt.show()
 
 # ----------------------
-# 9. ACTUAL VS PREDICTED
+# 8. ACTUAL VS PREDICTED
 # ----------------------
 # Linear Regression
 plt.figure(figsize=(6, 4))
 plt.scatter(y_test, lr_pred, alpha=0.5)
 plt.title("Linear Regression: Actual vs Predicted")
+plt.xlabel("Actual log(Revenue)")
+plt.ylabel("Predicted log(Revenue)")
+plt.tight_layout()
+
+# Ridge Regression
+plt.figure(figsize=(6, 4))
+plt.scatter(y_test, ridge_pred, alpha=0.5)
+plt.title("Ridge Regression: Actual vs Predicted")
 plt.xlabel("Actual log(Revenue)")
 plt.ylabel("Predicted log(Revenue)")
 plt.tight_layout()
@@ -300,10 +297,18 @@ plt.title("Decision Tree: Actual vs Predicted")
 plt.xlabel("Actual log(Revenue)")
 plt.ylabel("Predicted log(Revenue)")
 plt.tight_layout()
+
+# Random Forest
+plt.figure(figsize=(6, 4))
+plt.scatter(y_test, rf_pred, alpha=0.5)
+plt.title("Random Forest: Actual vs Predicted")
+plt.xlabel("Actual log(Revenue)")
+plt.ylabel("Predicted log(Revenue)")
+plt.tight_layout()
 plt.show()
 
 # --------------------------------------
-# 10. EXAMPLE PREDICTION FOR A NEW MOVIE
+# 9. EXAMPLE PREDICTION FOR A NEW MOVIE
 # --------------------------------------
 # Example movie features:
 # budget, runtime, popularity, vote_average, vote_count, release_year
@@ -317,18 +322,24 @@ new_movie = pd.DataFrame({
 })
 
 # Predict log(revenue)
-lr_new_log = lr_model.predict(new_movie)[0]
-dt_new_log = dt_model.predict(new_movie)[0]
+lr_new_log = lr_model.predict(new_movie)[0] # Linear Regression
+ridge_new_log = ridge_model.predict(new_movie)[0] # Ridge Regression
+dt_new_log = dt_model.predict(new_movie)[0] # Decision Tree
+rf_new_log = rf_model.predict(new_movie)[0] # Random Forest
 
 # Convert back to revenue
 lr_new_revenue = np.expm1(lr_new_log)
+ridge_new_revenue = np.expm1(ridge_new_log)
 dt_new_revenue = np.expm1(dt_new_log)
+rf_new_revenue = np.expm1(rf_new_log)
 
 print("\n==============================")
 print("Prediction Example")
 print("==============================")
 print("Linear Regression predicted revenue: $", round(lr_new_revenue, 2))
+print("Ridge Regression predicted revenue: $", round(ridge_new_revenue, 2))
 print("Decision Tree predicted revenue:   $", round(dt_new_revenue, 2))
+print("Random Forest predicted revenue:   $", round(rf_new_revenue, 2))
 
 # # ------------
 # # SAVE RESULTS
