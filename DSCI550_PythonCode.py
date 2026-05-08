@@ -36,7 +36,8 @@ from sklearn.metrics import (
 # -------------------------
 # 1. LOAD DATA and SUMMARY
 # -------------------------
-df = pd.read_csv(r"C:\Users\kyung\Desktop\Caleb Folder\USC Work\DSCI 550 - Seon Kim\Project\Version 3 Idea - Movie\tmdb_5000_movies.csv")
+csv_path = input("Enter the path to tmdb_5000_movies.csv: ").strip().strip('"').strip("'")
+df = pd.read_csv(csv_path)
 
 print("Shape:", df.shape)
 print("\nColumns:")
